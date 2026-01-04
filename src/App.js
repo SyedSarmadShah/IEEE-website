@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Camera, Upload, Edit2, Trash2, Plus, Lock, LogOut, Calendar, Users, Award, ExternalLink, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Camera, Upload, Edit2, Trash2, Plus, Lock, LogOut, Calendar, Users, Award, ExternalLink, X, ChevronLeft, ChevronRight, Mail, Phone, MapPin, Send, Instagram, Linkedin, MessageSquare } from 'lucide-react';
 
 const IEEECSWebsite = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -8,8 +8,11 @@ const IEEECSWebsite = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
+  const [contactSubmitted, setContactSubmitted] = useState(false);
   
   const STORAGE_KEY = 'ieee_cs_data';
+  const CONTACTS_KEY = 'ieee_cs_contacts';
   
   const [data, setData] = useState({
     ambassadors: [
@@ -35,6 +38,8 @@ const IEEECSWebsite = () => {
     }
   });
 
+  const [contacts, setContacts] = useState([]);
+
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -44,11 +49,25 @@ const IEEECSWebsite = () => {
         console.error('Error loading data:', e);
       }
     }
+
+    const savedContacts = localStorage.getItem(CONTACTS_KEY);
+    if (savedContacts) {
+      try {
+        setContacts(JSON.parse(savedContacts));
+      } catch (e) {
+        console.error('Error loading contacts:', e);
+      }
+    }
   }, []);
 
   const saveData = (newData) => {
     setData(newData);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+  };
+
+  const saveContacts = (newContacts) => {
+    setContacts(newContacts);
+    localStorage.setItem(CONTACTS_KEY, JSON.stringify(newContacts));
   };
 
   const handleLogin = () => {
@@ -64,6 +83,25 @@ const IEEECSWebsite = () => {
       alert('Login successful!');
     } else {
       alert('Invalid credentials. Default: admin / ieee2025');
+    }
+  };
+
+  const handleContactSubmit = (e) => {
+    e.preventDefault();
+    const newContact = {
+      id: Date.now(),
+      ...contactForm,
+      date: new Date().toISOString()
+    };
+    saveContacts([...contacts, newContact]);
+    setContactSubmitted(true);
+    setContactForm({ name: '', email: '', message: '' });
+    setTimeout(() => setContactSubmitted(false), 3000);
+  };
+
+  const deleteContact = (id) => {
+    if (window.confirm('Delete this message?')) {
+      saveContacts(contacts.filter(c => c.id !== id));
     }
   };
 
@@ -133,15 +171,6 @@ const IEEECSWebsite = () => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       const newData = { ...data };
       newData.events[eventType] = newData.events[eventType].filter(e => e.id !== id);
-      saveData(newData);
-    }
-  };
-
-  const deleteGalleryImage = (eventType, eventId, imageIndex) => {
-    if (window.confirm('Delete this image?')) {
-      const newData = { ...data };
-      const event = newData.events[eventType].find(e => e.id === eventId);
-      event.gallery.splice(imageIndex, 1);
       saveData(newData);
     }
   };
@@ -458,8 +487,10 @@ const IEEECSWebsite = () => {
             
             <nav className="flex items-center gap-6">
               <button onClick={() => setCurrentPage('home')} className={`text-white hover:text-cyan-400 transition-colors ${currentPage === 'home' ? 'text-cyan-400' : ''}`}>Home</button>
+              <button onClick={() => setCurrentPage('about')} className={`text-white hover:text-cyan-400 transition-colors ${currentPage === 'about' ? 'text-cyan-400' : ''}`}>About</button>
               <button onClick={() => setCurrentPage('team')} className={`text-white hover:text-cyan-400 transition-colors ${currentPage === 'team' ? 'text-cyan-400' : ''}`}>Team</button>
               <button onClick={() => setCurrentPage('events')} className={`text-white hover:text-cyan-400 transition-colors ${currentPage === 'events' ? 'text-cyan-400' : ''}`}>Events</button>
+              <button onClick={() => setCurrentPage('contact')} className={`text-white hover:text-cyan-400 transition-colors ${currentPage === 'contact' ? 'text-cyan-400' : ''}`}>Contact</button>
               
               {isAdmin ? (
                 <button onClick={() => { setIsAdmin(false); alert('Logged out successfully'); }} 
@@ -539,6 +570,199 @@ const IEEECSWebsite = () => {
           </div>
         )}
 
+        {currentPage === 'about' && (
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl font-bold text-white mb-8">About IEEE CS HITEC</h2>
+            
+            <div className="bg-gray-800/50 backdrop-blur-lg p-8 rounded-lg border border-cyan-500/30 mb-8">
+              <h3 className="text-2xl font-bold text-cyan-400 mb-4">Our Mission</h3>
+              <p className="text-gray-300 text-lg leading-relaxed">
+                The IEEE Computer Society HITEC Student Chapter is dedicated to advancing innovation, 
+                creativity, and excellence in the field of computing. We strive to provide our members 
+                with opportunities to develop technical skills, network with industry professionals, 
+                and contribute to cutting-edge research and projects.
+              </p>
+            </div>
+
+            <div className="bg-gray-800/50 backdrop-blur-lg p-8 rounded-lg border border-cyan-500/30 mb-8">
+              <h3 className="text-2xl font-bold text-cyan-400 mb-4">What We Do</h3>
+              <div className="space-y-4 text-gray-300">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2"></div>
+                  <p className="text-lg">Organize technical workshops and seminars on emerging technologies</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2"></div>
+                  <p className="text-lg">Host hackathons and coding competitions</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2"></div>
+                  <p className="text-lg">Facilitate networking events with industry experts</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2"></div>
+                  <p className="text-lg">Support student research and innovation projects</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2"></div>
+                  <p className="text-lg">Build a strong community of tech enthusiasts</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-800/50 backdrop-blur-lg p-8 rounded-lg border border-cyan-500/30">
+              <h3 className="text-2xl font-bold text-cyan-400 mb-4">Join Us</h3>
+              <p className="text-gray-300 text-lg leading-relaxed mb-4">
+                Whether you're a beginner or an experienced programmer, IEEE CS HITEC welcomes all 
+                students passionate about technology. Join us to enhance your skills, expand your network, 
+                and be part of a vibrant community of innovators.
+              </p>
+              <button 
+                onClick={() => setCurrentPage('contact')}
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:shadow-lg transition-all"
+              >
+                Get in Touch
+              </button>
+            </div>
+          </div>
+        )}
+
+        {currentPage === 'contact' && (
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl font-bold text-white mb-8">Contact Us</h2>
+            
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <div className="bg-gray-800/50 backdrop-blur-lg p-8 rounded-lg border border-cyan-500/30">
+                <h3 className="text-2xl font-bold text-cyan-400 mb-6">Get in Touch</h3>
+                
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4">
+                    <Mail className="w-6 h-6 text-cyan-400 mt-1" />
+                    <div>
+                      <p className="text-white font-semibold">Email</p>
+                      <a href="mailto:ieee.cs@hitecuni.edu.pk" className="text-gray-300 hover:text-cyan-400">
+                        ieee.cs@hitecuni.edu.pk
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <MapPin className="w-6 h-6 text-cyan-400 mt-1" />
+                    <div>
+                      <p className="text-white font-semibold">Location</p>
+                      <p className="text-gray-300">HITEC University, Taxila Cantt, Pakistan</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-700">
+                    <p className="text-white font-semibold mb-3">Follow Us</p>
+                    <div className="flex gap-4">
+                      <a 
+                        href="https://www.instagram.com/ieeecshitec/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-lg hover:shadow-lg transition-all"
+                      >
+                        <Instagram className="w-6 h-6 text-white" />
+                      </a>
+                      <a 
+                        href="https://www.linkedin.com/company/ieee-computer-society-hitec-student-chapter/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-blue-600 p-3 rounded-lg hover:shadow-lg transition-all"
+                      >
+                        <Linkedin className="w-6 h-6 text-white" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-800/50 backdrop-blur-lg p-8 rounded-lg border border-cyan-500/30">
+                <h3 className="text-2xl font-bold text-cyan-400 mb-6">Send a Message</h3>
+                
+                {contactSubmitted ? (
+                  <div className="bg-green-600/20 border border-green-500 rounded-lg p-4 mb-4">
+                    <p className="text-green-400 font-semibold">✓ Message sent successfully!</p>
+                    <p className="text-gray-300 text-sm">We'll get back to you soon.</p>
+                  </div>
+                ) : null}
+
+                <form onSubmit={handleContactSubmit} className="space-y-4">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Your Name"
+                      required
+                      className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-cyan-500 focus:outline-none"
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div>
+                    <input
+                      type="email"
+                      placeholder="Your Email"
+                      required
+                      className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-cyan-500 focus:outline-none"
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div>
+                    <textarea
+                      placeholder="Your Message"
+                      required
+                      rows="4"
+                      className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-cyan-500 focus:outline-none resize-none"
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                    />
+                  </div>
+                  
+                  <button 
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 rounded-lg flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+                  >
+                    <Send className="w-5 h-5" /> Send Message
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {isAdmin && contacts.length > 0 && (
+              <div className="bg-gray-800/50 backdrop-blur-lg p-8 rounded-lg border border-cyan-500/30">
+                <h3 className="text-2xl font-bold text-cyan-400 mb-6">
+                  <MessageSquare className="w-6 h-6 inline mr-2" />
+                  Received Messages ({contacts.length})
+                </h3>
+                <div className="space-y-4">
+                  {contacts.map(contact => (
+                    <div key={contact.id} className="bg-gray-700 p-4 rounded-lg border border-gray-600">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="text-white font-semibold">{contact.name}</p>
+                          <p className="text-cyan-400 text-sm">{contact.email}</p>
+                          <p className="text-gray-400 text-xs">{new Date(contact.date).toLocaleString()}</p>
+                        </div>
+                        <button
+                          onClick={() => deleteContact(contact.id)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <p className="text-gray-300">{contact.message}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {currentPage === 'team' && (
           <div>
             <h2 className="text-4xl font-bold text-white mb-8">Our Team</h2>
@@ -601,8 +825,34 @@ const IEEECSWebsite = () => {
       </main>
 
       <footer className="bg-black/50 backdrop-blur-lg border-t border-cyan-500/30 mt-16">
-        <div className="max-w-7xl mx-auto px-4 py-8 text-center text-gray-400">
-          <p>© 2025 IEEE Computer Society - HITEC University</p>
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-gray-400">© 2025 IEEE Computer Society - HITEC University</p>
+            <div className="flex items-center gap-4">
+              <a 
+                href="https://www.instagram.com/ieeecshitec/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a 
+                href="https://www.linkedin.com/company/ieee-computer-society-hitec-student-chapter/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+              <a 
+                href="mailto:ieee.cs@hitecuni.edu.pk"
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+              >
+                <Mail className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
