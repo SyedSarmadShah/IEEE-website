@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Upload, Edit2, Trash2, Plus, Lock, LogOut, Calendar, Users, Award, ExternalLink, X, ChevronLeft, ChevronRight, Mail, Phone, MapPin, Send, Instagram, Linkedin, MessageSquare } from 'lucide-react';
 
 const IEEECSWebsite = () => {
@@ -39,6 +40,21 @@ const IEEECSWebsite = () => {
   });
 
   const [contacts, setContacts] = useState([]);
+
+  // Framer Motion variants for staggered lists
+  const listVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.06,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 8 },
+    show: { opacity: 1, y: 0 },
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -227,7 +243,7 @@ const IEEECSWebsite = () => {
     }
 
     return (
-      <div className="bg-gray-800 p-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all">
+      <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} transition={{ duration: 0.35 }} className="bg-gray-800 p-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all">
         <div className="w-32 h-32 mx-auto mb-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center overflow-hidden">
           {member.image ? (
             <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
@@ -253,7 +269,7 @@ const IEEECSWebsite = () => {
             </button>
           </div>
         )}
-      </div>
+      </motion.div>
     );
   };
 
@@ -337,7 +353,7 @@ const IEEECSWebsite = () => {
     }
 
     return (
-      <div className="bg-gray-800 p-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all">
+      <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} transition={{ duration: 0.35 }} className="bg-gray-800 p-4 rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all">
         <div 
           className="w-full h-40 mb-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded overflow-hidden cursor-pointer"
           onClick={() => setSelectedEvent(event)}
@@ -366,7 +382,7 @@ const IEEECSWebsite = () => {
             </button>
           </div>
         )}
-      </div>
+      </motion.div>
     );
   };
 
@@ -385,8 +401,8 @@ const IEEECSWebsite = () => {
     };
 
     return (
-      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 8, opacity: 0 }} transition={{ duration: 0.3 }} className="bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
           <div className="sticky top-0 bg-gray-900 p-4 flex items-center justify-between border-b border-cyan-500/30">
             <div>
               <h2 className="text-2xl font-bold text-white">{selectedEvent.title}</h2>
@@ -456,8 +472,8 @@ const IEEECSWebsite = () => {
               </div>
             )}
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     );
   };
 
@@ -472,7 +488,7 @@ const IEEECSWebsite = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
-      <header className="bg-black/50 backdrop-blur-lg border-b border-cyan-500/30 sticky top-0 z-50">
+      <motion.header initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="bg-black/50 backdrop-blur-lg border-b border-cyan-500/30 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -506,7 +522,7 @@ const IEEECSWebsite = () => {
             </nav>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {showLogin && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
@@ -536,7 +552,9 @@ const IEEECSWebsite = () => {
         </div>
       )}
 
-      {selectedEvent && <EventGalleryModal />}
+      <AnimatePresence>
+        {selectedEvent && <EventGalleryModal key={selectedEvent.id} />}
+      </AnimatePresence>
 
       <main className="max-w-7xl mx-auto px-4 py-12">
         {currentPage === 'home' && (
@@ -772,11 +790,11 @@ const IEEECSWebsite = () => {
                 <h3 className="text-3xl font-bold text-cyan-400">Executive Body</h3>
                 {isAdmin && <AddNewButton onClick={() => addMember('executive', { name: '', role: '', linkedin: '' }, null)} text="Add Executive" />}
               </div>
-              <div className="grid md:grid-cols-4 gap-6">
+              <motion.div variants={listVariants} initial="hidden" animate="show" className="grid md:grid-cols-4 gap-6">
                 {data.executive.map(member => (
                   <MemberCard key={member.id} member={member} type="executive" showEdit={isAdmin} />
                 ))}
-              </div>
+              </motion.div>
             </div>
             
             <div>
@@ -784,11 +802,11 @@ const IEEECSWebsite = () => {
                 <h3 className="text-3xl font-bold text-cyan-400">Ambassadors</h3>
                 {isAdmin && <AddNewButton onClick={() => addMember('ambassadors', { name: '', linkedin: '' }, null)} text="Add Ambassador" />}
               </div>
-              <div className="grid md:grid-cols-5 gap-6">
+              <motion.div variants={listVariants} initial="hidden" animate="show" className="grid md:grid-cols-5 gap-6">
                 {data.ambassadors.map(member => (
                   <MemberCard key={member.id} member={member} type="ambassadors" showEdit={isAdmin} />
                 ))}
-              </div>
+              </motion.div>
             </div>
           </div>
         )}
@@ -802,11 +820,11 @@ const IEEECSWebsite = () => {
                 <h3 className="text-3xl font-bold text-cyan-400">Upcoming Events</h3>
                 {isAdmin && <AddNewButton onClick={() => addEvent('upcoming', { title: '', date: '', description: '', gallery: [] }, null, null)} text="Add Event" />}
               </div>
-              <div className="grid md:grid-cols-3 gap-6">
+              <motion.div variants={listVariants} initial="hidden" animate="show" className="grid md:grid-cols-3 gap-6">
                 {data.events.upcoming.map(event => (
                   <EventCard key={event.id} event={event} eventType="upcoming" showEdit={isAdmin} />
                 ))}
-              </div>
+              </motion.div>
             </div>
             
             <div>
@@ -814,11 +832,11 @@ const IEEECSWebsite = () => {
                 <h3 className="text-3xl font-bold text-cyan-400">Completed Events</h3>
                 {isAdmin && <AddNewButton onClick={() => addEvent('completed', { title: '', date: '', description: '', gallery: [] }, null, null)} text="Add Event" />}
               </div>
-              <div className="grid md:grid-cols-3 gap-6">
+              <motion.div variants={listVariants} initial="hidden" animate="show" className="grid md:grid-cols-3 gap-6">
                 {data.events.completed.map(event => (
                   <EventCard key={event.id} event={event} eventType="completed" showEdit={isAdmin} />
                 ))}
-              </div>
+              </motion.div>
             </div>
           </div>
         )}
