@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Upload, Edit2, Trash2, Plus, Lock, LogOut, Calendar, Users, Award, ExternalLink, X, ChevronLeft, ChevronRight, Mail, Phone, MapPin, Send, Instagram, Linkedin, MessageSquare } from 'lucide-react';
-
+import { Camera, Edit2, Trash2, Plus, Lock, LogOut, Calendar, Users, Award, ExternalLink, X, ChevronLeft, ChevronRight, Mail, MapPin, Send, Instagram, Linkedin, MessageSquare } from 'lucide-react';
 const IEEECSWebsite = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
